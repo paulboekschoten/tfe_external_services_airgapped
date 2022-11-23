@@ -39,3 +39,12 @@ override.tf.json
 
 # Ignore .pem files
 *.pem
+
+# Ignore debian packages
+*.deb
+
+# replicated installer
+replicated.tar.gz
+
+# airgap files
+*.airgap
