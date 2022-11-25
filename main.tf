@@ -20,3 +20,21 @@ resource "aws_vpc" "tfe" {
     Name = "${var.enviroment_name}-vpc"
   }
 }
+
+resource "aws_subnet" "tfe_public" {
+  vpc_id     = aws_vpc.tfe.id
+  cidr_block = cidrsubnet("10.200.0.0/16", 8, 0)
+
+  tags = {
+    Name = "${var.enviroment_name}-subnet-public"
+  }
+}
+
+resource "aws_subnet" "tfe_private" {
+  vpc_id     = aws_vpc.tfe.id
+  cidr_block = cidrsubnet("10.200.0.0/16", 8, 1)
+
+  tags = {
+    Name = "${var.enviroment_name}-subnet-private"
+  }
+}
