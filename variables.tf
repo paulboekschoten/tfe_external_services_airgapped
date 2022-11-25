@@ -3,7 +3,7 @@ variable "region" {
   description = "The region to deploy resources in."
 }
 
-variable "enviroment_name" {
+variable "environment_name" {
   type        = string
   description = "Name used to create and tag resources."
 }

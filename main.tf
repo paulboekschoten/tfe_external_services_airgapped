@@ -13,41 +13,46 @@ provider "aws" {
   region = var.region
 }
 
+# vpc
 resource "aws_vpc" "tfe" {
   cidr_block = var.vpc_cidr
 
   tags = {
-    Name = "${var.enviroment_name}-vpc"
+    Name = "${var.environment_name}-vpc"
   }
 }
 
+# public subnet
 resource "aws_subnet" "tfe_public" {
   vpc_id     = aws_vpc.tfe.id
   cidr_block = cidrsubnet("10.200.0.0/16", 8, 0)
 
   tags = {
-    Name = "${var.enviroment_name}-subnet-public"
+    Name = "${var.environment_name}-subnet-public"
   }
 }
 
+# private subnet
 resource "aws_subnet" "tfe_private" {
   vpc_id     = aws_vpc.tfe.id
   cidr_block = cidrsubnet("10.200.0.0/16", 8, 1)
 
   tags = {
-    Name = "${var.enviroment_name}-subnet-private"
+    Name = "${var.environment_name}-subnet-private"
   }
 }
 
+# internet gateway
 resource "aws_internet_gateway" "tfe_igw" {
   vpc_id = aws_vpc.tfe.id
 
   tags = {
-    Name = "${var.enviroment_name}-igw"
+    Name = "${var.environment_name}-igw"
   }
 }
 
-resource "aws_default_route_table" "example" {
+# add igw to default vpc route table
+resource "aws_default_route_table" "tfe" {
   default_route_table_id = aws_vpc.tfe.default_route_table_id
 
   route {
@@ -56,6 +61,26 @@ resource "aws_default_route_table" "example" {
   }
 
   tags = {
-    Name = "${var.enviroment_name}-rtb"
+    Name = "${var.environment_name}-rtb"
   }
+}
+
+# key pair
+# RSA key of size 4096 bits
+resource "tls_private_key" "rsa-4096" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# key pair in aws
+resource "aws_key_pair" "tfe" {
+  key_name   = "${var.environment_name}-keypair"
+  public_key = tls_private_key.rsa-4096.public_key_openssh
+}
+
+# store private ssh key locally
+resource "local_file" "tfesshkey" {
+  content         = tls_private_key.rsa-4096.private_key_pem
+  filename        = "${path.module}/tfesshkey.pem"
+  file_permission = "0600"
 }
