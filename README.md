@@ -32,7 +32,6 @@ This terraform code creates
 # How to install TFE with valid certficates on AWS
 
 # TODO
-- [ ] Create a key pair
 - [ ] Create security groups
 - [ ] Create a security group rules
 - [ ] Create valid certificates
@@ -51,3 +50,8 @@ This terraform code creates
 # DONE
 - [x] Create manually
 - [x] Add diagram
+- [x] Create VPC
+- [x] Create Subnets
+- [x] Create Internet gateway
+- [x] Change default Route Table
+- [x] Create Key pair
