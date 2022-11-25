@@ -38,3 +38,11 @@ resource "aws_subnet" "tfe_private" {
     Name = "${var.enviroment_name}-subnet-private"
   }
 }
+
+resource "aws_internet_gateway" "tfe_igw" {
+  vpc_id = aws_vpc.tfe.id
+
+  tags = {
+    Name = "${var.enviroment_name}-igw"
+  }
+}
