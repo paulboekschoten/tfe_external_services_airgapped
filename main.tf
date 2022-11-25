@@ -46,3 +46,16 @@ resource "aws_internet_gateway" "tfe_igw" {
     Name = "${var.enviroment_name}-igw"
   }
 }
+
+resource "aws_default_route_table" "example" {
+  default_route_table_id = aws_vpc.tfe.default_route_table_id
+
+  route {
+    cidr_block = local.all_ips
+    gateway_id = aws_internet_gateway.tfe_igw.id
+  }
+
+  tags = {
+    Name = "${var.enviroment_name}-rtb"
+  }
+}
