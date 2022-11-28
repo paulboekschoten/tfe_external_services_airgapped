@@ -31,9 +31,8 @@ This terraform code creates
 
 # How to install TFE with valid certficates on AWS
 
+
 # TODO
-- [ ] Create security groups
-- [ ] Create a security group rules
 - [ ] Create valid certificates
 - [ ] Create DNS record
 - [ ] Create an EC2 instance
@@ -55,3 +54,5 @@ This terraform code creates
 - [x] Create Internet gateway
 - [x] Change default Route Table
 - [x] Create Key pair
+- [x] Create security groups
+- [x] Create a security group rules
