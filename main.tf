@@ -42,11 +42,23 @@ resource "aws_subnet" "tfe_public" {
 
 # private subnet
 resource "aws_subnet" "tfe_private" {
-  vpc_id     = aws_vpc.tfe.id
-  cidr_block = cidrsubnet("10.200.0.0/16", 8, 1)
+  vpc_id            = aws_vpc.tfe.id
+  cidr_block        = cidrsubnet("10.200.0.0/16", 8, 1)
+  availability_zone = "${var.region}c"
 
   tags = {
     Name = "${var.environment_name}-subnet-private"
+  }
+}
+
+# private subnet
+resource "aws_subnet" "tfe_private2" {
+  vpc_id            = aws_vpc.tfe.id
+  cidr_block        = cidrsubnet("10.200.0.0/16", 8, 2)
+  availability_zone = "${var.region}a"
+
+  tags = {
+    Name = "${var.environment_name}-subnet-private2"
   }
 }
 
@@ -95,7 +107,8 @@ resource "local_file" "tfesshkey" {
 
 # security group
 resource "aws_security_group" "tfe_sg" {
-  name = "${var.environment_name}-sg"
+  name   = "${var.environment_name}-sg"
+  vpc_id = aws_vpc.tfe.id
 
   tags = {
     Name = "${var.environment_name}-sg"
@@ -180,8 +193,8 @@ resource "aws_instance" "tfe" {
   instance_type          = var.instance_type
   key_name               = aws_key_pair.tfe.key_name
   vpc_security_group_ids = [aws_security_group.tfe_sg.id]
-
-  iam_instance_profile = aws_iam_instance_profile.tfe_profile.name
+  subnet_id              = aws_subnet.tfe_public.id
+  iam_instance_profile   = aws_iam_instance_profile.tfe_profile.name
 
   root_block_device {
     volume_size = 100
@@ -341,4 +354,34 @@ resource "aws_iam_policy" "tfe_s3_policy" {
 resource "aws_iam_role_policy_attachment" "test-attach" {
   role       = aws_iam_role.tfe_s3_role.name
   policy_arn = aws_iam_policy.tfe_s3_policy.arn
+}
+
+# postgresql rds
+resource "aws_db_instance" "tfe" {
+  identifier          = "${var.environment_name}-postgres"
+  allocated_storage   = 50
+  db_name             = "tfe"
+  engine              = "postgres"
+  engine_version      = "14.5"
+  instance_class      = "db.m5.large"
+  username            = "postgres"
+  password            = var.postgresql_password
+  skip_final_snapshot = true
+
+  multi_az               = false
+  vpc_security_group_ids = [aws_security_group.tfe_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.tfe.name
+
+  tags = {
+    Name = "${var.environment_name}-postgres"
+  }
+}
+
+resource "aws_db_subnet_group" "tfe" {
+  name       = "${var.environment_name}-subnetgroup"
+  subnet_ids = [aws_subnet.tfe_private.id, aws_subnet.tfe_private2.id]
+
+  tags = {
+    Name = "${var.environment_name}-subnetgroup"
+  }
 }
