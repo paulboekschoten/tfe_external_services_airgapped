@@ -34,7 +34,6 @@ This terraform code creates
 
 # TODO
 - [ ] Create valid certificates
-- [ ] Create DNS record
 - [ ] Install TFE 
   - [ ] Create settings.json
   - [ ] Create replicated.conf
@@ -57,3 +56,4 @@ This terraform code creates
 - [x] Create a security group rules
 - [x] Create an EC2 instance
 - [x] Create EIP
+- [x] Create DNS record
