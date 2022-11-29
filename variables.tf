@@ -36,3 +36,9 @@ variable "postgresql_port" {
   type        = number
   default     = 5432
 }
+
+variable "instance_type" {
+  description = "The instance type to use for the TFE host."
+  type        = string
+  default     = "m5.xlarge"
+}

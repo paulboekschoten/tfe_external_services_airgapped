@@ -148,3 +148,36 @@ resource "aws_security_group_rule" "allow_all_outbound" {
   protocol    = local.any_protocol
   cidr_blocks = [local.all_ips]
 }
+
+# fetch ubuntu ami id for version 22.04
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+# EC2 instance
+resource "aws_instance" "paul-tfe" {
+  ami                    = data.aws_ami.ubuntu.image_id
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.tfe.key_name
+  vpc_security_group_ids = [aws_security_group.tfe_sg.id]
+
+  root_block_device {
+    volume_size = 100
+  }
+
+  tags = {
+    Name = "${var.environment_name}-tfe"
+  }
+}
