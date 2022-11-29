@@ -52,3 +52,8 @@ variable "route53_subdomain" {
   description = "the subdomain of the url"
   type        = string
 }
+
+variable "cert_email" {
+  description = "Email address used to obtain ssl certificate."
+  type        = string
+}

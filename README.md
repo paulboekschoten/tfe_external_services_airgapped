@@ -29,11 +29,12 @@ This terraform code creates
  - A TFE license
  - Docker libraries
 
-# How to install TFE with valid certficates on AWS
+# How to install airgapped TFE with valid certficates on AWS
 
 
 # TODO
-- [ ] Create valid certificates
+- [ ] Create S3 bucket
+- [ ] Create PostgreSQL database
 - [ ] Install TFE 
   - [ ] Create settings.json
   - [ ] Create replicated.conf
@@ -41,8 +42,6 @@ This terraform code creates
   - [ ] Copy license.rli
   - [ ] Create admin user
 - [ ] Documentation
-- [ ] Use template file instead of shell script
-
 
 # DONE
 - [x] Create manually
@@ -57,3 +56,4 @@ This terraform code creates
 - [x] Create an EC2 instance
 - [x] Create EIP
 - [x] Create DNS record
+- [x] Create valid certificate
