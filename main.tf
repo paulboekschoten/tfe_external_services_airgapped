@@ -167,7 +167,7 @@ data "aws_ami" "ubuntu" {
 }
 
 # EC2 instance
-resource "aws_instance" "paul-tfe" {
+resource "aws_instance" "tfe" {
   ami                    = data.aws_ami.ubuntu.image_id
   instance_type          = var.instance_type
   key_name               = aws_key_pair.tfe.key_name
@@ -180,4 +180,18 @@ resource "aws_instance" "paul-tfe" {
   tags = {
     Name = "${var.environment_name}-tfe"
   }
+}
+
+# create public ip
+resource "aws_eip" "eip_tfe" {
+  vpc = true
+  tags = {
+    Name = var.environment_name
+  }
+}
+
+# associate public ip with instance
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.tfe.id
+  allocation_id = aws_eip.eip_tfe.id
 }
