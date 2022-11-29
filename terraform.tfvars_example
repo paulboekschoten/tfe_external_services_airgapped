@@ -1,3 +1,5 @@
-region = "eu-west-3"
-environment_name = "tfe-airgap"
-vpc_cidr = "10.200.0.0/16"
+region            = "eu-west-3"
+environment_name  = "tfe-airgap"
+vpc_cidr          = "10.200.0.0/16"
+route53_zone      = "example.com"
+route53_subdomain = "tfe-airgap"

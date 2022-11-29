@@ -42,3 +42,13 @@ variable "instance_type" {
   type        = string
   default     = "m5.xlarge"
 }
+
+variable "route53_zone" {
+  description = "The domain used in the URL."
+  type        = string
+}
+
+variable "route53_subdomain" {
+  description = "the subdomain of the url"
+  type        = string
+}

@@ -195,3 +195,19 @@ resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.tfe.id
   allocation_id = aws_eip.eip_tfe.id
 }
+
+## route53 fqdn
+# fetch zone
+data "aws_route53_zone" "selected" {
+  name         = var.route53_zone
+  private_zone = false
+}
+
+# create record
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = local.fqdn
+  type    = "A"
+  ttl     = "300"
+  records = [aws_eip.eip_tfe.public_ip]
+}
