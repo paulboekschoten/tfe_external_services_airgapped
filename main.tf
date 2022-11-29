@@ -251,3 +251,86 @@ resource "aws_acm_certificate" "cert" {
   certificate_body  = acme_certificate.certificate.certificate_pem
   certificate_chain = acme_certificate.certificate.issuer_pem
 }
+
+# s3 bucket
+resource "aws_s3_bucket" "tfe" {
+  bucket = "${var.environment_name}-bucket"
+
+  tags = {
+    Name = "${var.environment_name}-bucket"
+  }
+}
+
+# disable all public bucket access
+resource "aws_s3_bucket_public_access_block" "tfe" {
+  bucket = aws_s3_bucket.tfe.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# iam role
+resource "aws_iam_role" "tfe_s3_role" {
+  name = "${var.environment_name}-role"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ec2.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    tag-key = "${var.environment_name}-role"
+  }
+}
+
+# role policy
+resource "aws_iam_policy" "tfe_s3_policy" {
+  name = "${var.environment_name}-policy"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor0",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListStorageLensConfigurations",
+          "s3:ListAccessPointsForObjectLambda",
+          "s3:GetAccessPoint",
+          "s3:PutAccountPublicAccessBlock",
+          "s3:GetAccountPublicAccessBlock",
+          "s3:ListAllMyBuckets",
+          "s3:ListAccessPoints",
+          "s3:PutAccessPointPublicAccessBlock",
+          "s3:ListJobs",
+          "s3:PutStorageLensConfiguration",
+          "s3:ListMultiRegionAccessPoints",
+          "s3:CreateJob"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "VisualEditor1",
+        "Effect" : "Allow",
+        "Action" : "s3:*",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+# attach policy to role
+resource "aws_iam_role_policy_attachment" "test-attach" {
+  role       = aws_iam_role.tfe_s3_role.name
+  policy_arn = aws_iam_policy.tfe_s3_policy.arn
+}

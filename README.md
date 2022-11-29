@@ -33,7 +33,6 @@ This terraform code creates
 
 
 # TODO
-- [ ] Create S3 bucket
 - [ ] Create PostgreSQL database
 - [ ] Install TFE 
   - [ ] Create settings.json
@@ -57,3 +56,4 @@ This terraform code creates
 - [x] Create EIP
 - [x] Create DNS record
 - [x] Create valid certificate
+- [x] Create S3 bucket
