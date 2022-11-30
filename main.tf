@@ -268,6 +268,39 @@ resource "aws_acm_certificate" "cert" {
 }
 
 # s3 bucket
+resource "aws_s3_bucket" "tfe_files" {
+  bucket = "${var.environment_name}-filesbucket"
+
+  tags = {
+    Name = "${var.environment_name}-filesbucket"
+  }
+}
+
+# disable all public bucket access
+resource "aws_s3_bucket_public_access_block" "tfe_files" {
+  bucket = aws_s3_bucket.tfe_files.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# upload license to s3 filesbucket
+resource "aws_s3_object" "replicated_license" {
+  bucket = "${var.environment_name}-filesbucket"
+  key    = "license.rli"
+  source = "config/license.rli"
+}
+
+# upload airgap file to s3 filesbucket
+resource "aws_s3_object" "replicated_airgap" {
+  bucket = "${var.environment_name}-filesbucket"
+  key    = "tfe_660.airgap"
+  source = "files/tfe_660.airgap"
+}
+
+# s3 bucket
 resource "aws_s3_bucket" "tfe" {
   bucket = "${var.environment_name}-bucket"
 

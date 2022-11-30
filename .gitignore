@@ -48,3 +48,6 @@ replicated.tar.gz
 
 # airgap files
 *.airgap
+
+# zip files
+*.zip
