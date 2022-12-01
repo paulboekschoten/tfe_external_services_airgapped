@@ -196,6 +196,20 @@ resource "aws_instance" "tfe" {
   subnet_id              = aws_subnet.tfe_public.id
   iam_instance_profile   = aws_iam_instance_profile.tfe_profile.name
 
+  user_data = templatefile("${path.module}/scripts/cloud-init.tpl", {
+    region               = var.region
+    enc_password        = var.tfe_encryption_password,
+    replicated_password = var.replicated_password,
+    admin_username      = var.admin_username,
+    admin_email         = var.admin_email,
+    admin_password      = var.admin_password
+    pg_password         = var.postgresql_password
+    fqdn                = local.fqdn
+    s3files             = aws_s3_bucket.tfe_files.bucket
+    pg_netloc           = aws_db_instance.tfe.endpoint
+    airgap_file         = var.airgap_file
+  })
+
   root_block_device {
     volume_size = 100
   }
@@ -203,6 +217,12 @@ resource "aws_instance" "tfe" {
   tags = {
     Name = "${var.environment_name}-tfe"
   }
+
+  depends_on = [
+    aws_s3_bucket.tfe,
+    aws_s3_bucket.tfe_files,
+    aws_db_instance.tfe
+  ]
 }
 
 # create public ip
@@ -296,8 +316,22 @@ resource "aws_s3_object" "replicated_license" {
 # upload airgap file to s3 filesbucket
 resource "aws_s3_object" "replicated_airgap" {
   bucket = "${var.environment_name}-filesbucket"
-  key    = "tfe_660.airgap"
-  source = "files/tfe_660.airgap"
+  key    = var.airgap_file
+  source = "files/${var.airgap_file}"
+}
+
+# upload certificate file to s3 filesbucket
+resource "aws_s3_object" "certificate" {
+  bucket  = "${var.environment_name}-filesbucket"
+  key     = "tfe_server.crt"
+  content = "${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}"
+}
+
+# upload private key file to s3 filesbucket
+resource "aws_s3_object" "private_key" {
+  bucket  = "${var.environment_name}-filesbucket"
+  key     = "tfe_server.key"
+  content = acme_certificate.certificate.private_key_pem
 }
 
 # s3 bucket
@@ -410,6 +444,7 @@ resource "aws_db_instance" "tfe" {
   }
 }
 
+# database subnet group
 resource "aws_db_subnet_group" "tfe" {
   name       = "${var.environment_name}-subnetgroup"
   subnet_ids = [aws_subnet.tfe_private.id, aws_subnet.tfe_private2.id]
