@@ -62,3 +62,33 @@ variable "postgresql_password" {
   description = "PostgreSQL password."
   type        = string
 }
+
+variable "tfe_encryption_password" {
+  description = "Password used to encrypt TFE data."
+  type        = string
+}
+
+variable "replicated_password" {
+  description = "Replicated dahsboard password."
+  type        = string
+}
+
+variable "admin_username" {
+  description = "Username for the TFE admin account."
+  type        = string
+}
+
+variable "admin_email" {
+  description = "Email address for the TFE admin account."
+  type        = string
+}
+
+variable "admin_password" {
+  description = "Password for the TFE admin account."
+  type        = string
+}
+
+variable "airgap_file" {
+  description = "Name of the airgap file in folder files/"
+  type        = string
+}

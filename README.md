@@ -33,13 +33,6 @@ This terraform code creates
 
 
 # TODO
-- [ ] Create PostgreSQL database
-- [ ] Install TFE 
-  - [ ] Create settings.json
-  - [ ] Create replicated.conf
-  - [ ] Copy certificates
-  - [ ] Copy license.rli
-  - [ ] Create admin user
 - [ ] Documentation
 
 # DONE
@@ -57,3 +50,11 @@ This terraform code creates
 - [x] Create DNS record
 - [x] Create valid certificate
 - [x] Create S3 bucket
+- [x] Create PostgreSQL database
+- [x] Install TFE 
+  - [x] Create settings.json
+  - [x] Create replicated.conf
+  - [x] Copy certificates
+  - [x] Copy airgap file
+  - [x] Copy license.rli
+  - [x] Create admin user
