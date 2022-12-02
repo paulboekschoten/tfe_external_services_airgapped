@@ -221,6 +221,10 @@ resource "aws_instance" "tfe" {
   depends_on = [
     aws_s3_bucket.tfe,
     aws_s3_bucket.tfe_files,
+    aws_s3_object.replicated_license,
+    aws_s3_object.replicated_airgap,
+    aws_s3_object.certificate,
+    aws_s3_object.private_key,
     aws_db_instance.tfe
   ]
 }
@@ -229,7 +233,7 @@ resource "aws_instance" "tfe" {
 resource "aws_eip" "eip_tfe" {
   vpc = true
   tags = {
-    Name = var.environment_name
+    Name = "${var.environment_name}-eip"
   }
 }
 
@@ -308,28 +312,28 @@ resource "aws_s3_bucket_public_access_block" "tfe_files" {
 
 # upload license to s3 filesbucket
 resource "aws_s3_object" "replicated_license" {
-  bucket = "${var.environment_name}-filesbucket"
+  bucket = aws_s3_bucket.tfe_files.bucket
   key    = "license.rli"
   source = "config/license.rli"
 }
 
 # upload airgap file to s3 filesbucket
 resource "aws_s3_object" "replicated_airgap" {
-  bucket = "${var.environment_name}-filesbucket"
+  bucket = aws_s3_bucket.tfe_files.bucket
   key    = var.airgap_file
   source = "files/${var.airgap_file}"
 }
 
 # upload certificate file to s3 filesbucket
 resource "aws_s3_object" "certificate" {
-  bucket  = "${var.environment_name}-filesbucket"
+  bucket  = aws_s3_bucket.tfe_files.bucket
   key     = "tfe_server.crt"
   content = "${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}"
 }
 
 # upload private key file to s3 filesbucket
 resource "aws_s3_object" "private_key" {
-  bucket  = "${var.environment_name}-filesbucket"
+  bucket  = aws_s3_bucket.tfe_files.bucket
   key     = "tfe_server.key"
   content = acme_certificate.certificate.private_key_pem
 }
